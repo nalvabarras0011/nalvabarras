@@ -452,6 +452,7 @@ footer{padding:2rem 5rem;background:var(--ink);display:flex;justify-content:spac
   .sec-title{font-size:1.5rem}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -677,13 +678,22 @@ window.addEventListener('scroll', () => {
 });
 
 /* form */
-function doSubmit() {
+const _sb = supabase.createClient(
+  'https://kaxxsgghazkpjxertbbu.supabase.co',
+  'sb_publishable_fam2H5otMOR71ef8CGPHEw_L_hO05Hn'
+);
+
+async function doSubmit() {
   const n=document.getElementById('f-name').value.trim();
   const e=document.getElementById('f-email').value.trim();
   const p=document.getElementById('f-phone').value.trim();
   const i=document.getElementById('f-int').value;
   if(!n||!e||!p||!i){alert('Preencha: nome, e-mail, WhatsApp e interesse.');return}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){alert('E-mail inválido.');return}
+  const btn=document.querySelector('.submit-btn');
+  btn.disabled=true;btn.textContent='Enviando…';
+  const{error}=await _sb.from('leads').insert({nome:n,email:e,whatsapp:p,interesse:i});
+  if(error){btn.disabled=false;btn.textContent='Entrar na lista de espera ✦';alert('Erro ao enviar. Tente novamente.');return}
   document.getElementById('form-body').style.display='none';
   document.getElementById('form-ok').style.display='block';
 }
